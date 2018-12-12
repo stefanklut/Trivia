@@ -25,6 +25,8 @@ public class MenuActivity extends AppCompatActivity {
         updateRadioGroup(questions);
         updateRadioGroup(difficulty);
         updateRadioGroup(type);
+
+        // TODO add category selection
     }
 
     private class OnCheckedChangeListener implements RadioGroup.OnCheckedChangeListener {
@@ -61,7 +63,7 @@ public class MenuActivity extends AppCompatActivity {
         String typeButtonText = (String) checkedTypeButton.getText();
 
         Intent intent = new Intent(MenuActivity.this, GamePlayActivity.class);
-        intent.putExtra("questions", questionsButtonText);
+        intent.putExtra("number of questions", questionsButtonText);
         intent.putExtra("difficulty", difficultyButtonText);
         intent.putExtra("type", typeButtonText);
         startActivity(intent);

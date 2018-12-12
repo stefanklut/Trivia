@@ -1,18 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".GamePlay">
+    android:layout_margin="16dp"
+    android:orientation="vertical"
+    tools:context=".GamePlayActivity">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/textViewCategory"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:gravity="center"
+        android:text='"Category"' />
 
-</android.support.constraint.ConstraintLayout>
+    <TextView
+        android:id="@+id/textViewQuestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="top|center"
+        android:text='"Question"'
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewQuestionsInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Questions left:" />
+
+    <Button
+        android:id="@+id/buttonRight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="answerQuestion"
+        android:text='"Answer"'
+        app:layout_column="2"
+        app:layout_row="1" />
+
+    <Button
+        android:id="@+id/buttonLeft"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="answerQuestion"
+        android:text='"Answer"'
+        app:layout_column="0"
+        app:layout_row="1" />
+
+    <Button
+        android:id="@+id/buttonBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="answerQuestion"
+        android:text='"Answer"'
+        app:layout_column="1"
+        app:layout_row="2" />
+
+    <Button
+        android:id="@+id/buttonTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="answerQuestion"
+        android:text='"Answer"'
+        app:layout_column="1"
+        app:layout_row="0" />
+
+    <TextView
+        android:id="@+id/textViewScore"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="bottom|center"
+        android:text="Current Score: 0" />
+
+    <TextView
+        android:id="@+id/textViewGameInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text='"Game Info"' />
+
+</LinearLayout>
