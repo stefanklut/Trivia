@@ -13,12 +13,24 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="HighScores" />
+        android:text="High Scores:"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textViewGameInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text='"Game Info"'
+        android:textAlignment="center" />
 
     <ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp" />
+        tools:layout_editor_absoluteY="8dp" >
+
+    </ListView>
+
 </LinearLayout>

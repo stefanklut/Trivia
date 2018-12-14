@@ -1,22 +1,29 @@
 package com.example.stefan.trivia;
 
-public class HighScore {
-    private int score;
-    String timeStamp;
+public class HighScore implements Comparable<HighScore>{
+    private double score;
+    private String timestamp;
 
-    public int getScore() {
+    public double getScore() {
         return score;
     }
 
-    public void setScore(int score) {
+    public void setScore(double score) {
         this.score = score;
     }
 
-    public String getTimeStamp() {
-        return timeStamp;
+    public String getTimestamp() {
+        return timestamp;
     }
 
-    public void setTimeStamp(String timeStamp) {
-        this.timeStamp = timeStamp;
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    @Override
+    public int compareTo(HighScore o) {
+        if (this.score > o.score) return 1;
+        if (this.score < o.score) return -1;
+        return 0;
     }
 }

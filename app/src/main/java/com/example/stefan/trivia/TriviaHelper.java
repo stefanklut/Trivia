@@ -10,9 +10,9 @@ public class TriviaHelper implements Serializable, QuestionsRequest.Callback {
     private Stack<Question> questions;
     Context context;
     PassThrough activity;
-    String numberOfQuestions;
-    String difficulty;
-    String type;
+    private String numberOfQuestions;
+    private String difficulty;
+    private String type;
 
     public interface PassThrough {
         void questionsReady();
@@ -28,6 +28,14 @@ public class TriviaHelper implements Serializable, QuestionsRequest.Callback {
         this.numberOfQuestions = numberOfQuestions;
         this.difficulty = difficulty;
         this.type = type;
+    }
+
+    public Stack<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(Stack<Question> questions) {
+        this.questions = questions;
     }
 
     public String getNumberOfQuestions() {

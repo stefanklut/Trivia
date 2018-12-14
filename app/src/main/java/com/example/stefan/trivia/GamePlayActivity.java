@@ -7,19 +7,29 @@ import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 import static java.util.Collections.shuffle;
 
-public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.PassThrough {
+public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.PassThrough, PostRequestHelper.Callback {
 
     TriviaHelper triviaHelper;
     Question currentQuestion;
-    int score;
+    double score;
+    String numberOfQuestions;
+    String difficulty;
+    String type;
+
 
     @Override
     public void questionsReady() {
+        findViewById(R.id.buttonFourth).setClickable(true);
+        findViewById(R.id.buttonThird).setClickable(true);
+        findViewById(R.id.buttonSecond).setClickable(true);
+        findViewById(R.id.buttonFirst).setClickable(true);
+
         nextQuestion();
     }
 
@@ -29,9 +39,20 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
         setContentView(R.layout.activity_game_play);
 
         Intent intent = getIntent();
-        String numberOfQuestions = intent.getStringExtra("number of questions");
-        String difficulty = intent.getStringExtra("difficulty");
-        String type = intent.getStringExtra("type");
+        numberOfQuestions = intent.getStringExtra("number of questions");
+        difficulty = intent.getStringExtra("difficulty");
+        type = intent.getStringExtra("type");
+
+        TextView textViewGameInfo = findViewById(R.id.textViewGameInfo);
+        textViewGameInfo.setText("Number of Questions: " + numberOfQuestions + "\n" +
+                "Difficulty: " + difficulty + "\n" +
+                "Game Type: " + type);
+        updateScore();
+
+        findViewById(R.id.buttonFourth).setClickable(false);
+        findViewById(R.id.buttonThird).setClickable(false);
+        findViewById(R.id.buttonSecond).setClickable(false);
+        findViewById(R.id.buttonFirst).setClickable(false);
 
         triviaHelper = new TriviaHelper(this, this, numberOfQuestions, difficulty, type);
     }
@@ -41,11 +62,19 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
         String correctAnswer = Html.fromHtml(currentQuestion.getCorrectAnswer(), Html.FROM_HTML_MODE_LEGACY).toString();
         if (buttonText.equals(correctAnswer)) {
             score++;
+            updateScore();
         }
 
         if (triviaHelper.gameFinished()) {
-            Intent intent = new Intent(GamePlayActivity.this, HighScoreActivity.class);
-            startActivity(intent);
+            findViewById(R.id.buttonFourth).setClickable(false);
+            findViewById(R.id.buttonThird).setClickable(false);
+            findViewById(R.id.buttonSecond).setClickable(false);
+            findViewById(R.id.buttonFirst).setClickable(false);
+
+            score = score/Double.valueOf(numberOfQuestions);
+
+            PostRequestHelper postRequestHelper = new PostRequestHelper(this);
+            postRequestHelper.postScore(this, score, numberOfQuestions, difficulty, type);
             return;
         }
         nextQuestion();
@@ -53,44 +82,60 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
 
     private void nextQuestion() {
         currentQuestion = triviaHelper.getQuestion();
-        updateViews();
+        updateQuestionFields();
     }
 
-    private void updateViews() {
+    private void updateScore() {
+        TextView textViewScore = findViewById(R.id.textViewScore);
+        textViewScore.setText("Current score: " + score + "/" + numberOfQuestions);
+    }
+
+    private void updateQuestionFields() {
         TextView textViewCategory = findViewById(R.id.textViewCategory);
         TextView textViewQuestion = findViewById(R.id.textViewQuestion);
         TextView textViewQuestionInfo = findViewById(R.id.textViewQuestionsInfo);
-        TextView textViewScore = findViewById(R.id.textViewScore);
-        TextView textViewGameInfo = findViewById(R.id.textViewGameInfo);
 
-        Button buttonTop = findViewById(R.id.buttonTop);
-        Button buttonBottom = findViewById(R.id.buttonBottom);
-        Button buttonRight = findViewById(R.id.buttonRight);
-        Button buttonLeft = findViewById(R.id.buttonLeft);
+        Button buttonFirst = findViewById(R.id.buttonFirst);
+        Button buttonSecond = findViewById(R.id.buttonSecond);
+        Button buttonThird = findViewById(R.id.buttonThird);
+        Button buttonFourth = findViewById(R.id.buttonFourth);
 
-        textViewGameInfo.setText("Number of Questions: " + triviaHelper.getNumberOfQuestions()+ "\n" +
-                "Difficulty: " + triviaHelper.getDifficulty() + "\n" +
-                "Game Type: " + triviaHelper.getType());
+
         textViewQuestionInfo.setText("Questions left: " + triviaHelper.getQuestionsLeft());
         textViewCategory.setText("Category: " + currentQuestion.getCategory());
         textViewQuestion.setText(Html.fromHtml(currentQuestion.getQuestion(), Html.FROM_HTML_MODE_LEGACY));
-        textViewScore.setText("Current score: " + score);
+
 
         if (currentQuestion.getType().equals("boolean")) {
-            buttonBottom.setVisibility(View.INVISIBLE);
-            buttonTop.setVisibility(View.INVISIBLE);
-            buttonLeft.setText("True");
-            buttonRight.setText("False");
+            buttonThird.setVisibility(View.INVISIBLE);
+            buttonFourth.setVisibility(View.INVISIBLE);
+
+            buttonFirst.setText("True");
+            buttonSecond.setText("False");
         } else {
-            buttonBottom.setVisibility(View.VISIBLE);
-            buttonTop.setVisibility(View.VISIBLE);
+            buttonThird.setVisibility(View.VISIBLE);
+            buttonFourth.setVisibility(View.VISIBLE);
             ArrayList<String> answers = currentQuestion.getIncorrectAnswers();
             answers.add(currentQuestion.getCorrectAnswer());
             shuffle(answers);
-            buttonTop.setText(Html.fromHtml(answers.get(0), Html.FROM_HTML_MODE_LEGACY));
-            buttonBottom.setText(Html.fromHtml(answers.get(1), Html.FROM_HTML_MODE_LEGACY));
-            buttonLeft.setText(Html.fromHtml(answers.get(2) ,Html.FROM_HTML_MODE_LEGACY));
-            buttonRight.setText(Html.fromHtml(answers.get(3), Html.FROM_HTML_MODE_LEGACY));
+            buttonFourth.setText(Html.fromHtml(answers.get(0), Html.FROM_HTML_MODE_LEGACY));
+            buttonThird.setText(Html.fromHtml(answers.get(1), Html.FROM_HTML_MODE_LEGACY));
+            buttonSecond.setText(Html.fromHtml(answers.get(2) ,Html.FROM_HTML_MODE_LEGACY));
+            buttonFirst.setText(Html.fromHtml(answers.get(3), Html.FROM_HTML_MODE_LEGACY));
         }
+    }
+
+    @Override
+    public void postedHighScore() {
+        Intent intent = new Intent(GamePlayActivity.this, HighScoreActivity.class);
+        intent.putExtra("numberOfQuestions", numberOfQuestions);
+        intent.putExtra("difficulty", difficulty);
+        intent.putExtra("type", type);
+        startActivity(intent);
+    }
+
+    @Override
+    public void postError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 }
