@@ -28,9 +28,17 @@
         android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_weight="1"
         tools:layout_editor_absoluteX="8dp"
-        tools:layout_editor_absoluteY="8dp" >
+        tools:layout_editor_absoluteY="8dp">
 
     </ListView>
+
+    <Button
+        android:id="@+id/buttonNewGame"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="newTrivia"
+        android:text="New Trivia" />
 
 </LinearLayout>

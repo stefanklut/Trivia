@@ -2,7 +2,6 @@ package com.example.stefan.trivia;
 
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -43,21 +42,30 @@ public class HighScoreHelper implements Response.Listener<JSONArray>, Response.E
 
     @Override
     public void onResponse(JSONArray response) {
+        // Array list for the high scores
         ArrayList<HighScore> highScores = new ArrayList<>();
         for (int i = 0; i<response.length(); i++) {
             try {
+                // Get the json object from the json array
                 JSONObject jsonObject = response.getJSONObject(i);
+
+                // Add the values from the json object to a high score object
                 HighScore highScore = new HighScore();
                 highScore.setScore(Double.valueOf(jsonObject.getString("score")));
                 highScore.setTimestamp(jsonObject.getString("timestamp"));
+
+                // Add high score object to array list
                 highScores.add(highScore);
             } catch (JSONException e) {
                 e.printStackTrace();
                 helper.gotHighScoreError(e.getMessage());
             }
         }
+
+        // Sort the high scores so that the list goes from highest score to lowest
         sort(highScores);
         reverse(highScores);
+
         helper.gotHighScore(highScores);
     }
 
@@ -67,12 +75,15 @@ public class HighScoreHelper implements Response.Listener<JSONArray>, Response.E
         // Create Volley queue
         RequestQueue queue = Volley.newRequestQueue(context);
 
-        String apiQuery = "https://ide50-stefanklut.cs50.io:8080/" + numberOfQuestions + difficulty + type;
+        // Url from which the high scores are retrieved
+        String url = "https://ide50-stefanklut.cs50.io:8080/";
 
-        Log.d("Trivia", "getHighScore: " + apiQuery);
+        // Add what type of high scores need to be retrieved
+        String apiQuery = url + numberOfQuestions + difficulty + type;
 
         // Create JsonObjectRequest with API url
-        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, apiQuery, null, this, this);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, apiQuery,
+                null, this, this);
 
         // Put request in the queue
         queue.add(jsonArrayRequest);

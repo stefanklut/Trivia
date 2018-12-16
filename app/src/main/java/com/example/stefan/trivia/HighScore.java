@@ -22,6 +22,7 @@ public class HighScore implements Comparable<HighScore>{
 
     @Override
     public int compareTo(HighScore o) {
+        // By implementing the Comparable superclass we can compare the HighScore objects
         if (this.score > o.score) return 1;
         if (this.score < o.score) return -1;
         return 0;

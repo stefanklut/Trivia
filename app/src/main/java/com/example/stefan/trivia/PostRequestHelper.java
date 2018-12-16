@@ -35,11 +35,13 @@ public class PostRequestHelper implements Response.Listener, Response.ErrorListe
 
     @Override
     public void onErrorResponse(VolleyError error) {
+        // If Volley gets an error return this to the helper
         callback.postError(error.getMessage());
     }
 
     @Override
     public void onResponse(Object response) {
+        // Return that the post was successful
         callback.postedHighScore();
     }
 
@@ -55,8 +57,13 @@ public class PostRequestHelper implements Response.Listener, Response.ErrorListe
         protected Map<String, String> getParams() {
 
             Map<String, String> params = new HashMap<>();
+            // Add score as parameter
             params.put("score", String.valueOf(score));
+
+            // Format the way the timestamp should be displayed
             SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+            // Add timestamp as parameter
             params.put("timestamp", simpleDateFormat.format(new Date()));
             return params;
         }
@@ -69,9 +76,19 @@ public class PostRequestHelper implements Response.Listener, Response.ErrorListe
         this.type = type;
         this.callback = callback;
 
-        String url = "https://ide50-stefanklut.cs50.io:8080/" + numberOfQuestions + difficulty + type;
+        // Url where the high score will be added
+        String url = "https://ide50-stefanklut.cs50.io:8080/";
+
+        // Specify what type of high score is being posted
+        String extendedUrl = url + numberOfQuestions + difficulty + type;
+
+        // Create Volley queue
         RequestQueue queue = Volley.newRequestQueue(context);
-        PostRequest request = new PostRequest(Request.Method.POST, url, this, this);
+
+        // Create PostRequest with url
+        PostRequest request = new PostRequest(Request.Method.POST, extendedUrl, this, this);
+
+        // Put request in the queue
         queue.add(request);
     }
 }

@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -47,13 +46,16 @@ public class QuestionsRequest implements Response.Listener<JSONObject>, Response
             helper.gotQuestionsError(e.getMessage());
         }
 
-        // If it does put the items from the JSONArray into a MenuItem Object in an ArrayList
+        // If it does put the items from the JSONArray into a HighScore Object on a Stack
         if (jsonArray != null) {
             Stack<Question> questions = new Stack<>();
             for (int i = 0; i<jsonArray.length(); i++) {
                 try {
-                    Question question = new Question();
+                    // Get the json object from the json array
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                    // Add the values from the json object to a high score object
+                    Question question = new Question();
                     question.setCategory(jsonObject.getString("category"));
                     question.setType(jsonObject.getString("type"));
                     question.setDifficulty(jsonObject.getString("difficulty"));
@@ -65,6 +67,8 @@ public class QuestionsRequest implements Response.Listener<JSONObject>, Response
                         incorrectAnswers.add(jsonArrayIncorrectAnswers.getString(j));
                     }
                     question.setIncorrectAnswers(incorrectAnswers);
+
+                    // Add the question on the Stack
                     questions.add(question);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -81,17 +85,21 @@ public class QuestionsRequest implements Response.Listener<JSONObject>, Response
         // Create Volley queue
         RequestQueue queue = Volley.newRequestQueue(context);
 
+        // The api url
         String apiQuery = "https://opentdb.com/api.php";
 
+        // add the amount of questions that have to be retrieved
         apiQuery += "?amount=" + questions;
 
+        // Add the difficulty of the questions that have to be retrieved.
+        // No difficulty specified means a random difficulty for the questions
         if (!difficulty.equals("random")) {
             apiQuery += "&difficuly=" + difficulty;
         }
 
+        // Add the type of question asked. No type specified means the questions are of both types
         if (!type.equals("random")) {
             apiQuery += "&type=";
-            Log.d("Trivia", "getQuestions: "+ type);
             if (type.equals("multiple choice")) {
                 apiQuery += "multiple";
             }
@@ -99,8 +107,6 @@ public class QuestionsRequest implements Response.Listener<JSONObject>, Response
                 apiQuery += "boolean";
             }
         }
-
-        Log.d("Trivia", "getQuestions: " + apiQuery);
 
         // Create JsonObjectRequest with API url
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
