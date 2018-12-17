@@ -15,10 +15,20 @@ public class TriviaHelper implements Serializable, QuestionsRequest.Callback {
         void questionsReady();
     }
 
-    public TriviaHelper(Context context, PassThrough activity, String numberOfQuestions, String difficulty, String type) {
+    public TriviaHelper(Context context, PassThrough activity) {
         this.context = context;
         this.activity = activity;
+    }
 
+    public Stack<Question> getQuestions() {
+        return questions;
+    }
+
+    public void setQuestions(Stack<Question> questions) {
+        this.questions = questions;
+    }
+
+    public void requestQuestions(String numberOfQuestions, String difficulty, String type) {
         // Make a request for the questions
         QuestionsRequest questionsRequest = new QuestionsRequest(context);
         questionsRequest.getQuestions(this, numberOfQuestions.toLowerCase(),

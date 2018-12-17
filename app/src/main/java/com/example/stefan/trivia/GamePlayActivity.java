@@ -1,15 +1,19 @@
 package com.example.stefan.trivia;
 
 import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
 
 import static java.util.Collections.shuffle;
 
@@ -26,10 +30,7 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
     @Override
     public void questionsReady() {
         // Make buttons clickable
-        findViewById(R.id.buttonFourth).setClickable(true);
-        findViewById(R.id.buttonThird).setClickable(true);
-        findViewById(R.id.buttonSecond).setClickable(true);
-        findViewById(R.id.buttonFirst).setClickable(true);
+        buttonsClickable(true);
 
         // Retrieve the next question
         nextQuestion();
@@ -52,17 +53,41 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
                 "Difficulty: " + difficulty + "\n" +
                 "Game Type: " + type);
 
-        // Update the score display
-        updateScore();
-
         // Make the buttons not clickable
-        findViewById(R.id.buttonFourth).setClickable(false);
-        findViewById(R.id.buttonThird).setClickable(false);
-        findViewById(R.id.buttonSecond).setClickable(false);
-        findViewById(R.id.buttonFirst).setClickable(false);
+        buttonsClickable(false);
 
         // Set the trivia helper that provides the questions
-        triviaHelper = new TriviaHelper(this, this, numberOfQuestions, difficulty, type);
+        triviaHelper = new TriviaHelper(this, this);
+
+        if (savedInstanceState == null) {
+            // If there was no game in progress request the questions
+            triviaHelper.requestQuestions(numberOfQuestions, difficulty, type);
+        } else {
+            // If it was in progress get the current question, the score and the remaining questions
+            // from the savedInstanceState to restore the game
+            triviaHelper.setQuestions((Stack) savedInstanceState.getSerializable("questions"));
+            currentQuestion = (Question) savedInstanceState.getSerializable("question");
+            score = savedInstanceState.getDouble("score");
+
+            // update the text views that are dependent on the question
+            updateQuestionFields();
+
+            // Make the buttons not clickable
+            buttonsClickable(true);
+        }
+
+        // Update the score display
+        updateScore();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the current state of the game
+        outState.putSerializable("questions", triviaHelper.getQuestions());
+        outState.putSerializable("question", currentQuestion);
+        outState.putDouble("score", score);
     }
 
     public void answerQuestion(View view) {
@@ -80,10 +105,7 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
 
         if (triviaHelper.gameFinished()) {
             // Make the buttons not clickable
-            findViewById(R.id.buttonFourth).setClickable(false);
-            findViewById(R.id.buttonThird).setClickable(false);
-            findViewById(R.id.buttonSecond).setClickable(false);
-            findViewById(R.id.buttonFirst).setClickable(false);
+            buttonsClickable(false);
 
             // make the score a percentage
             score = score/Double.valueOf(numberOfQuestions);
@@ -96,6 +118,14 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
 
         // Retrieve the next question
         nextQuestion();
+    }
+
+    private void buttonsClickable(boolean bool){
+        // Set the clickability of the buttons
+        findViewById(R.id.buttonFourth).setClickable(bool);
+        findViewById(R.id.buttonThird).setClickable(bool);
+        findViewById(R.id.buttonSecond).setClickable(bool);
+        findViewById(R.id.buttonFirst).setClickable(bool);
     }
 
     private void nextQuestion() {
@@ -146,7 +176,8 @@ public class GamePlayActivity extends AppCompatActivity implements TriviaHelper.
             buttonFourth.setVisibility(View.VISIBLE);
 
             // Put all answers in a list
-            ArrayList<String> answers = currentQuestion.getIncorrectAnswers();
+            ArrayList<String> answers = new ArrayList<>();
+            answers.addAll(currentQuestion.getIncorrectAnswers());
             answers.add(currentQuestion.getCorrectAnswer());
 
             // Shuffle this list so the correct answer is always in a different place

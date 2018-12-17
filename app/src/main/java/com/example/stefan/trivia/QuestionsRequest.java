@@ -94,7 +94,7 @@ public class QuestionsRequest implements Response.Listener<JSONObject>, Response
         // Add the difficulty of the questions that have to be retrieved.
         // No difficulty specified means a random difficulty for the questions
         if (!difficulty.equals("random")) {
-            apiQuery += "&difficuly=" + difficulty;
+            apiQuery += "&difficulty=" + difficulty;
         }
 
         // Add the type of question asked. No type specified means the questions are of both types
